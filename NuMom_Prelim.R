@@ -51,8 +51,9 @@ tree1 <- rpart(sptb37 ~ ., data=a, method="class", control=rpart.control(minspli
 
 # here is a crude plot of the tree
 ## we can make this nicer for publication, if desired
-plot(tree1)   # "Error in plot.rpart(tree1) : fit is not a tree, just a root"
-text(tree1)
+
+plot(tree1, branch=0.1, uniform=TRUE, compress=TRUE)  
+text(tree1, use.n=TRUE, all=TRUE, cex=0.9)
 
 
 # measuring "impact"
