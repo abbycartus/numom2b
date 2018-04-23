@@ -10,6 +10,8 @@ for (package in packages) {
   library(package, character.only=T)
 }
 
+install.packages("rpart.plot")
+
 library("tidyverse")
 library("tabplot")
 library("VIM")
@@ -35,25 +37,34 @@ aggr(a)
 a <- a[complete.cases(a), ]
 
 #Converting integer variables to factors
-a$sptb37 <- as.factor(a$sptb37)
-a$smokerpre <- as.factor(a$smoker)
-a$agecat3 <- as.factor(a$agecat3)
-a$bmicat <- as.factor(a$bmicat)
-a$white <- as.factor(a$white)
-a$college <- as.factor(a$college)
-a$married <- as.factor(a$married)
+a$sptb37 <- factor(a$sptb37, levels=c(0,1), labels=c("Not preterm", "Preterm"))
+a$smokerpre <- factor(a$smoker)
+a$agecat3 <- factor(a$agecat3)
+a$bmicat <- factor(a$bmicat)
+a$white <- factor(a$white)
+a$college <- factor(a$college)
+a$married <- factor(a$married)
+
+#Switching columns in the data frame to see if column order matters
+b <- a[c("bmi", "agecat3", "smokerpre", "white", "bmicat", "college","married","sptb37", "heix_tot")]
 
 # classification and regression tree
 # to use the "Class ~ ." notation, make sure you only have things in the data that you want in teh model
 # the outcome here is called "Class" (case matters)
 # We have only the variables we want in the model, outcome = sptb37
-tree1 <- rpart(sptb37 ~ ., data=a, method="class", control=rpart.control(minsplit=10, minbucket=3, cp=0.001))
+tree1 <- rpart(sptb37 ~ ., data=a, method="class", control=rpart.control(minsplit=25, minbucket=3, cp=0.001))
+#Exact same tree but with different column order
+tree2 <- rpart(sptb37 ~ ., data=b, method="class", control=rpart.control(minsplit=10, minbucket=3, cp=0.001))
 
 # here is a crude plot of the tree
 ## we can make this nicer for publication, if desired
 
 plot(tree1, branch=0.1, uniform=TRUE, compress=TRUE)  
 text(tree1, use.n=TRUE, all=TRUE, cex=0.9)
+rpart.plot(tree1, extra=3) #extra = 3 gives misclassification rate
+
+plot(tree2, branch=0.1, uniform=TRUE, compress=TRUE)  
+text(tree2, use.n=TRUE, all=TRUE, cex=0.9)
 
 
 # measuring "impact"
