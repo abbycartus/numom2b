@@ -84,14 +84,14 @@ a0 <- a; a0$heix_tot <- median(a$heix_tot) - 33.75262
 a1 <- a; a1$heix_tot <- median(a$heix_tot)
 
 #creating different datasets for different contrasts: choose your own adventure
-a0 <- a; a0$heix_tot <- 45.8 #median of HEI quintile 1 
-a1 <- a; a1$heix_tot <- 79.1 #median of HEI quintile 5 
+a0 <- a; a0$heix_tot <- 79.1 #median of HEI quintile 5 45.8 #median of HEI quintile 1 
+a1 <- a; a1$heix_tot <- 45.8 #median of HEI quintile 1 
 
-a0 <- a; a0$heix_tot <- 38.9 #overall split score
-a1 <- a; a1$heix_tot <- median(a$heix_tot)
+a0 <- a; a0$heix_tot <- median(a$heix_tot)
+a1 <- a; a1$heix_tot <- 38.9 #overall split score median(a$heix_tot)
 
-a0 <- a; a0$heix_tot <- 38.9 #overall split score
-a1 <- a; a1$heix_tot <- 79.1 #median of HEI quintile 5
+a0 <- a; a0$heix_tot <- 79.1 #median of HEI quintile 5
+a1 <- a; a1$heix_tot <- 38.9 #overall split score
 
 # predict from each
 y0 <- predict(tree1,newdata = a0)
