@@ -42,7 +42,7 @@ aggr(a)
 a <- a[complete.cases(a), ]
 
 #Converting integer variables to factors
-a$sptb37 <- factor(a$sptb37)
+a$sptb37 <- factor(a$sptb37, levels=c(0,1), labels=c("Not preterm", "Preterm"))
 a$smokerpre <- factor(a$smokerpre)
 a$agecat3 <- factor(a$agecat3)
 a$bmicat <- factor(a$bmicat)
@@ -50,20 +50,9 @@ a$white <- factor(a$white)
 a$college <- factor(a$college)
 a$married <- factor(a$married)
 
-#Labeling variables so they'll look nicer on the tree
-a = apply_labels(a,
-                 sptb37 = "Preterm birth",
-                 smokerpre = "Smoker",
-                 agecat3 = "Age group",
-                 bmicat = "BMI group",
-                 white = "Race",
-                 college = "Education",
-                 married = "Marital status"
-)
-
 # classification and regression tree
 # since Abby can't write a workable function, specify which component you want on each run
-tree1 <- rpart(sptb37 ~ smokerpre + agecat3 + bmicat + white + college + married + g_nwhldens,  data=a, method="class", control=rpart.control(minsplit=30, minbucket=1, cp=0.001))
+tree1 <- rpart(sptb37 ~ smokerpre + agecat3 + bmicat + white + college + married + g_nwhldens,  data=a, method="class", control=rpart.control(minsplit=10, minbucket=3, cp=0.001))
 #for v_totdens and d_totdens, control parameters for rpart were changes: minsplit = 10, minbucket = 3, cp = 0.001
 
 #Plotting the tree
@@ -74,18 +63,12 @@ rpart.plot(tree1, extra=1)
 # measuring "impact"
 
 # median of quintiles of each variable
-a$g_whlq <- ntile(a$g_whldens, 5)  #creating quintile
-aggregate(a$g_whldens, list(a$g_whlq), median) #getting the median of each quintile (I think!)
+a$rq <- ntile(a$g_nwhldens, 5)  #creating quintile
+aggregate(a$g_nwhldens, list(a$rq), median) #getting the median of each quintile (I think!)
 
 #creating different datasets for different contrasts: choose your own adventure
-a0 <- a; a0$g_whldens <- 0.1727258 #median of whole grain quintile 1 
-a1 <- a; a1$g_whldens <- 1.2224421 #median of whole grain quintile 5 
-
-a0 <- a; a0$heix_tot <- 38.9 #overall split score
-a1 <- a; a1$heix_tot <- median(a$heix_tot)
-
-a0 <- a; a0$heix_tot <- 38.9 #overall split score
-a1 <- a; a1$heix_tot <- 79.1 #median of HEI quintile 5
+a0 <- a; a0$g_nwhldens <- 2.9 #median of veg quintile 5   
+a1 <- a; a1$g_nwhldens <- 2.17 #median of veg quintile 1
 
 # predict from each
 y0 <- predict(tree1,newdata = a0)
