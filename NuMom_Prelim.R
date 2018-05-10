@@ -12,6 +12,7 @@ for (package in packages) {
 
 install.packages("rpart.plot")
 install.packages("expss")
+install.packages("here")
 
 library("expss")
 library("tidyverse")
@@ -19,10 +20,11 @@ library("tabplot")
 library("VIM")
 library("rpart")
 library("rpart.plot")
+library("here")
 
 ## import data here.
  
-setwd("/Users/abigailcartus/Box/numom2b diet and machine learning")
+setwd("/Users/abigailcartus/Box/numom2b diet and machine learning/Data/")
 getwd()
 a<- read.csv("numom_small HEI total score.csv", header=TRUE, sep=",")
 
@@ -41,24 +43,12 @@ a <- a[complete.cases(a), ]
 
 #Converting integer variables to factors
 a$sptb37 <- factor(a$sptb37, levels=c(0,1), labels=c("Not preterm", "Preterm"))
-a$smokerpre <- factor(a$smokerpre, levels=c(1,2), labels=c("Nonsmoker","Smoker"))
+a$smokerpre <- factor(a$smokerpre, levels=c(1,2), labels=c("Smoker","Nonsmoker"))
 a$agecat3 <- factor(a$agecat3)
 a$bmicat <- factor(a$bmicat)
 a$white <- factor(a$white)
 a$college <- factor(a$college)
 a$married <- factor(a$married)
-
-#Labeling variables so they'll look nicer on the tree
-a = apply_labels(a,
-                 sptb37 = "Preterm birth",
-                 smokerpre = "Smoker",
-                 agecat3 = "Age group",
-                 bmicat = "BMI group",
-                 white = "Race",
-                 college = "Education",
-                 married = "Marital status",
-                 heix_tot = "HEI score"
-                 )
 
 #Switching columns in the data frame to see if column order matters
 b <- a[c("bmi", "agecat3", "smokerpre", "white", "bmicat", "college","married","sptb37", "heix_tot")]
