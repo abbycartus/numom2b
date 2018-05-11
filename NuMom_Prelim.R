@@ -10,8 +10,7 @@ for (package in packages) {
   library(package, character.only=T)
 }
 
-
-a<- read.csv("./numom_small HEI total score.csv", header=TRUE, sep=",")
+a<- read.csv("/Users/abigailcartus/Box/numom2b diet and machine learning/Data/numom_small_everything we need.csv", header=TRUE, sep=",")
 
 head(a)
 
@@ -32,14 +31,14 @@ nrow(a)
 
 #Converting integer variables to factors
 a$sptb37 <- factor(a$sptb37, levels=c(0,1), labels=c("Not preterm", "Preterm"))
-a$smokerpre <- factor(a$smokerpre, levels=c(1,2), labels=c("Smoker","Nonsmoker"))
+a$smokerpre <- factor(a$smokerpre, levels=c(0,1), labels=c("Nonsmoker","Smoker"))
 a$agecat3 <- factor(a$agecat3)
-a$white <- factor(a$white)
+a$black <- factor(a$black)
 a$college <- factor(a$college)
 a$married <- factor(a$married)
 
 #Switching columns in the data frame to see if column order matters
-b <- a[c("bmi", "agecat3", "smokerpre", "white", "bmicat", "college","married","sptb37", "heix_tot")]
+#b <- a[c("bmi", "agecat3", "smokerpre", "white", "bmicat", "college","married","sptb37", "heix_tot")]
 
 names(a)
 ggplot(a) + geom_histogram(aes(x=heix_tot))
@@ -49,11 +48,11 @@ ggplot(a) + geom_point(aes(x=bmi,y=heix_tot))
 table(a$smokerpre)
 table(a$agecat3)
 table(a$sptb37)
-table(a$white)
+table(a$black)
 table(a$college)
 table(a$married)
 
-tree1 <- rpart(sptb37 ~ ., data=a, method="class", control=rpart.control(minsplit=5, minbucket=3, cp=0.001))
+tree1 <- rpart(sptb37 ~ heix_tot + smokerpre + insurpub + agecat3 + bmi + college + married + black, data=a, method="class", control=rpart.control(minsplit=9, minbucket=3, cp=0.001))
 
 #Plotting the tree
 plot(tree1, branch=0.1, uniform=TRUE, compress=TRUE)  
@@ -65,22 +64,11 @@ rpart.plot(tree1, extra=1)
 hist(a$heix_tot)
 median(a$heix_tot)
 
-#creating different datasets for different contrasts: choose your own adventure
-a0 <- a; a0$heix_tot <- 79.1 #median of HEI quintile 5 
-a1 <- a; a1$heix_tot <- 45.8 #median of HEI quintile 1 
-
-a0 <- a; a0$heix_tot <- median(a$heix_tot)
-a1 <- a; a1$heix_tot <- 38.9 #overall split score median(a$heix_tot)
-
-a0 <- a; a0$heix_tot <- 79.1 #median of HEI quintile 5
-a1 <- a; a1$heix_tot <- 38.9 #overall split score
-
-# predict from each
-
+#For now, need to substitute each outcome for each 
 pFunc <- function(data,indices,outcome){
   
   varname<-eval(substitute(outcome), data)
-  tree1 <- rpart(varname~ ., data=data[indices,], method="class", control=rpart.control(minsplit=25, minbucket=3, cp=0.001))
+  tree1 <- rpart(varname~ heix_tot + smokerpre + insurpub + agecat3 + bmi + college + married + black, data=data[indices,], method="class", control=rpart.control(minsplit=9, minbucket=3, cp=0.001))
   
   medians <- data[indices,] %>% 
     group_by(quantiles=ntile(heix_tot,5)) %>% 
