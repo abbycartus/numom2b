@@ -101,8 +101,9 @@ a1 <- a; a1$heix_tot <- 38.9 #overall split score
 
 pFunc <- function(data,indices,outcome){
   
-  form <- as.formula(paste(outcome, " ~ .")[2])
-  tree1 <- rpart(form, data=data[indices,], method="class", control=rpart.control(minsplit=25, minbucket=3, cp=0.001))
+  varname <- enquo(outcome)
+  tree1_call <- expr(rpart(!!varname ~ ., data=data[indices], method="class"),control=rpart.control(minsplit=25, minbucket=3, cp=0.001))
+  tree1 <- eval_bare(tree1_call)
   
   suppressMessages(
   medians <- data[indices,] %>% 
@@ -137,8 +138,6 @@ pFunc <- function(data,indices,outcome){
   
 }
 
-## for some reason this yields null effect, and not what was in table
-## bc the tree splits HEI only below the median of Q1??
 pFunc(a,1:nrow(a),quo(sptb37))
 
 # bootstrapping
