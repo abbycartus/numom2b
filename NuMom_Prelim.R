@@ -1,5 +1,5 @@
 #Install and load packages
-packages <- c("tidyverse","tabplot","VIM","rpart","rpart.plot","expss","here","boot")
+packages <- c("tidyverse","tabplot","VIM","rpart","rpart.plot","expss","here","boot","rlang")
 for (package in packages) {
   if (!require(package, character.only=T, quietly=T)) {
     install.packages(package,repos='http://lib.stat.cmu.edu/R/CRAN') 
@@ -101,8 +101,8 @@ a1 <- a; a1$heix_tot <- 38.9 #overall split score
 
 pFunc <- function(data,indices,outcome){
   
-  varname <- enquo(outcome)
-  tree1_call <- expr(rpart(!!varname ~ ., data=data[indices], method="class"),control=rpart.control(minsplit=25, minbucket=3, cp=0.001))
+  varname <- enexpr(outcome)
+  tree1_call <- expr(rpart(!!varname ~ ., data=data[indices,], method="class",control=rpart.control(minsplit=25, minbucket=3, cp=0.001)))
   tree1 <- eval_bare(tree1_call)
   
   suppressMessages(
@@ -135,7 +135,6 @@ pFunc <- function(data,indices,outcome){
   
   results<-cbind(RD,RR,OR)
   return(results)
-  
 }
 
 pFunc(a,1:nrow(a),sptb37)
