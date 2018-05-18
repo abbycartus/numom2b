@@ -138,7 +138,7 @@ pFunc <- function(data,indices,outcome){
   
 }
 
-pFunc(a,1:nrow(a),quo(sptb37))
+pFunc(a,1:nrow(a),sptb37)
 
 # bootstrapping
 boot_res <- boot(data=a,statistic=pFunc,R=1000,outcome=sptb37)
